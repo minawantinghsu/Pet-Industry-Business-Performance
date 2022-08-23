@@ -72,3 +72,6 @@ FROM `keepcalmqueryon.mina.retention_final` as mr;
 
 SELECT * FROM `mina.order_detail` as od
 JOIN `mina.products` as p ON od.SKU = p.SKU;
+
+
+END
