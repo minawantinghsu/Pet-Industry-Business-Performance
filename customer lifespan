@@ -1,0 +1,23 @@
+###customer lifespan - def the time difference between the latest order to the first order, how long each customer has purchased with us.
+
+SELECT c.Customer_ID, c.Product_Name, date_diff(max(c.Order_Time),min(c.Order_Time), DAY)as customer_lifespan
+FROM `mina.complete` as c  
+group by  c.Customer_ID,c.Product_Name;
+
+SELECT AVG(cl.customer_lifespan)
+FROM `mina.Customer_lifespan` as cl;
+
+### Cat
+SELECT c.Customer_ID, date_diff(max(c.Order_Time),min(c.Order_Time), DAY)as customer_lifespan
+FROM `mina.complete` as c  
+WHERE c.Product_Name LIKE '%Cat%'
+GROUP BY  c.Customer_ID;
+
+### Dog
+SELECT c.Customer_ID, date_diff(max(c.Order_Time),min(c.Order_Time), DAY)as customer_lifespan
+FROM `mina.complete` as c  
+WHERE c.Product_Name LIKE '%Dog%'
+GROUP BY  c.Customer_ID;
+
+
+END 
