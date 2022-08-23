@@ -69,3 +69,5 @@ SELECT mrd.monthly, mrd.total_cohort, mrd.cohort_return, mrd.cohort_return/mrd.t
 FROM `keepcalmqueryon.mina.monthly_retention_dog` as mrd
 ORDER BY mrd.monthly; 
 
+
+END
