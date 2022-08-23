@@ -1,0 +1,74 @@
+### Retention Rate 
+### Create tables
+
+SELECT
+    o.Customer_ID,
+    o.Order_Time,
+    p.Product_Name
+  FROM
+    `keepcalmqueryon.mina.order_detail` as o
+  LEFT JOIN `mina.products` as p 
+  ON o.SKU = p.SKU;
+  
+  
+  ### Join tables 
+  
+  SELECT
+    r1.Customer_ID,
+    r1.Order_Time AS date1,
+    r2.Order_Time AS date2,
+    r1.Product_Name
+  FROM
+    `keepcalmqueryon.mina.retention1_1` AS r1
+  LEFT JOIN
+    `keepcalmqueryon.mina.Retention1_2` AS r2
+  ON
+    r1.Customer_ID = r2.Customer_ID
+    AND r1.Order_Time < r2.Order_Time;
+
+### Create rolling based retention rate 
+  SELECT
+    j.Customer_ID,
+    j.date1,
+    j.Product_Name,
+    COUNT(CASE
+        WHEN date2 BETWEEN date1 AND DATE_ADD(j.date1, INTERVAL 30 DAY) THEN j.Customer_ID
+      ELSE
+      NULL
+    END) AS return_count,
+    COUNT(DISTINCT
+      CASE
+        WHEN j.date2 BETWEEN j.date1 AND DATE_ADD(j.date1, INTERVAL 30 DAY) THEN j.Customer_ID
+      ELSE
+      NULL
+    END
+      ) AS unique_return_count
+  FROM
+    `keepcalmqueryon.mina.RetentionJoin` AS j
+  GROUP BY
+    j.Customer_ID,
+    j.date1,
+    j.Product_Name;
+
+SELECT
+  DATE_TRUNC(date1, month) as monthly,
+  COUNT(DISTINCT rf.Customer_ID) as total_cohort,
+  COUNT(DISTINCT
+    CASE
+      WHEN rf.unique_return_count = 1 THEN rf.Customer_ID
+    ELSE
+    NULL
+  END
+    ) as cohort_return,
+  rf.Product_Name
+FROM
+  `mina.cohort` AS rf
+GROUP BY monthly,
+Product_Name;
+
+SELECT mr.monthly,mr.Product_Name, mr.total_cohort, mr.cohort_return, mr.cohort_return/mr.total_cohort as retention_rate
+FROM `keepcalmqueryon.mina.retention_final` as mr; 
+
+
+SELECT * FROM `mina.order_detail` as od
+JOIN `mina.products` as p ON od.SKU = p.SKU;
