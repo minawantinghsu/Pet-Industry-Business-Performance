@@ -1,0 +1,71 @@
+### Create tables
+SELECT
+    c.Customer_ID,
+    c.Order_Time,
+    c.Product_Name
+FROM
+    `keepcalmqueryon.mina.complete` as c
+WHERE c.Product_Name LIKE '%Dog%';
+
+###join tables
+
+SELECT
+    d1.Customer_ID,
+    d1.Order_Time AS date1,
+    d2.Order_Time AS date2
+  FROM
+    `keepcalmqueryon.mina.D1` AS d1
+  LEFT JOIN
+    `keepcalmqueryon.mina.D2` AS d2
+  ON
+    d1.Customer_ID = d2.Customer_ID
+    AND d1.Order_Time < d2.Order_Time
+
+
+### create retention 
+
+SELECT
+   dj.Customer_ID,
+   dj.date1,
+  COUNT(
+      CASE
+        WHEN date2 BETWEEN date1 AND DATE_ADD(dj.date1, INTERVAL 30 DAY) THEN dj.Customer_ID
+      ELSE
+      NULL
+    END
+      ) AS return_count,
+  COUNT( DISTINCT
+      CASE
+        WHEN dj.date2 BETWEEN dj.date1 AND DATE_ADD(dj.date1, INTERVAL 30 DAY) THEN dj.Customer_ID
+      ELSE
+      NULL
+    END
+      ) AS unique_return_count
+  FROM
+    `mina.dog_join` AS dj
+  GROUP BY
+   dj.Customer_ID, dj.date1
+
+
+### cohort 
+
+SELECT
+  DATE_TRUNC(date1, month) as monthly,
+  COUNT(DISTINCT df.Customer_ID) as total_cohort,
+  COUNT(DISTINCT
+    CASE
+      WHEN df.unique_return_count = 1 THEN df.Customer_ID
+    ELSE
+    NULL
+  END
+    ) as cohort_return
+FROM
+  `mina.final_dog` AS df
+GROUP BY monthly;
+
+### final count 
+
+SELECT mrd.monthly, mrd.total_cohort, mrd.cohort_return, mrd.cohort_return/mrd.total_cohort as retention_rate
+FROM `keepcalmqueryon.mina.monthly_retention_dog` as mrd
+ORDER BY mrd.monthly; 
+
