@@ -66,6 +66,7 @@ SELECT mrc.monthly, mrc.total_cohort, mrc.cohort_return, mrc.cohort_return/mrc.t
 FROM `keepcalmqueryon.mina.monthly_retention_cat` as mrc
 ORDER BY mrc.monthly; 
 
+END
 
 
 
