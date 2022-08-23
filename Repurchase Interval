@@ -1,0 +1,25 @@
+### all repurchase days
+
+SELECT j.Customer_ID, j.Product_Name, j.date1, date_diff(j.date2,j.date1,DAY) as days_to_next_purchase
+FROM `mina.RetentionJoin`as j
+
+###cat
+
+SELECT c1.Customer_ID, c1.Order_Time as time1, c2.Order_Time as time2
+FROM `mina.Cat1` as c1
+JOIN `mina.C2` as c2 
+ON c1.Customer_ID = c2.Customer_ID
+AND c1.Order_Time < c2.Order_Time;
+
+SELECT cj.Customer_ID, cj.date1, date_diff(cj.date2,cj.date1,DAY) as days_to_next_purchase
+FROM `mina.cat_join`as cj
+
+
+###dog
+
+SELECT dj.Customer_ID, dj.date1, date_diff(dj.date2,dj.date1,DAY) as days_to_next_purchase
+FROM `mina.dog_join`as dj
+
+
+
+
