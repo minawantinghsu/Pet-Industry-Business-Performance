@@ -1,0 +1,71 @@
+### Create tables
+SELECT
+    c.Customer_ID,
+    c.Order_Time,
+    c.Product_Name
+FROM `keepcalmqueryon.mina.complete` as c
+WHERE c.Product_Name LIKE '%Cat%';
+
+### Join tables 
+SELECT
+    r1.Customer_ID,
+    r1.Order_Time AS date1,
+    r2.Order_Time AS date2
+  FROM
+    `keepcalmqueryon.mina.retention1` AS r1
+  LEFT JOIN
+    `keepcalmqueryon.mina.retention2` AS r2
+  ON
+    r1.Customer_ID = r2.Customer_ID
+    AND r1.Order_Time < r2.Order_Time
+
+### count retention
+
+SELECT
+    cj.Customer_ID,
+    cj.date1,
+    COUNT(
+      CASE
+        WHEN date2 BETWEEN date1 AND DATE_ADD(cj.date1, INTERVAL 30 DAY) THEN cj.Customer_ID
+      ELSE
+      NULL
+    END
+      ) AS return_count,
+    COUNT( DISTINCT
+      CASE
+        WHEN cj.date2 BETWEEN cj.date1 AND DATE_ADD(cj.date1, INTERVAL 30 DAY) THEN cj.Customer_ID
+      ELSE
+      NULL
+    END
+      ) AS unique_return_count
+  FROM
+    `keepcalmqueryon.mina.cat_join` AS cj
+  GROUP BY
+    cj.Customer_ID, cj.date1
+
+
+### cohort 
+
+SELECT
+  DATE_TRUNC(date1, month) as monthly,
+  COUNT(DISTINCT cf.Customer_ID) as total_cohort,
+  COUNT(DISTINCT
+    CASE
+      WHEN cf.unique_return_count = 1 THEN cf.Customer_ID
+    ELSE
+    NULL
+  END
+    ) as cohort_return
+FROM
+  `mina.catfinaltable` AS cf
+GROUP BY monthly;
+
+### final count 
+
+SELECT mrc.monthly, mrc.total_cohort, mrc.cohort_return, mrc.cohort_return/mrc.total_cohort as retention_rate
+FROM `keepcalmqueryon.mina.monthly_retention_cat` as mrc
+ORDER BY mrc.monthly; 
+
+
+
+
